@@ -4,30 +4,34 @@ import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Block<T> implements Serializable {
+public class Block implements Serializable {
     private int index;
     private Long timestamp;
     private String hash;
     private String previousHash;
-    private T payload;
+    private String creator;
 
     @Override
     public String toString() {
         return "Block{" +
                 "index=" + index +
                 ", timestamp=" + timestamp +
+                ", creator=" + creator +
 //                ", hash='" + hash + '\'' +
 //                ", previousHash='" + previousHash + '\'' +
-                ", payload=" + payload +
                 '}';
     }
 
-    public Block(int index, String preHash, T payload) {
+    // for jackson
+    public Block() {
+    }
+
+    public Block(int index, String preHash, String creator) {
         this.index = index;
         this.previousHash = preHash;
-        this.payload = payload;
+        this.creator = creator;
         timestamp = System.currentTimeMillis();
-        hash = calculateHash(String.valueOf(index) + previousHash + String.valueOf(timestamp) + payload.toString());
+        hash = calculateHash(String.valueOf(index) + previousHash + String.valueOf(timestamp));
     }
 
     public int getIndex() {
@@ -44,10 +48,6 @@ public class Block<T> implements Serializable {
 
     public String getPreviousHash() {
         return previousHash;
-    }
-
-    public T getPayload() {
-        return payload;
     }
 
     private String calculateHash(String text) {

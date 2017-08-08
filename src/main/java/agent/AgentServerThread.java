@@ -5,15 +5,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import static agent.Message.MESSAGE_TYPE.NEW_BLOCK;
 import static agent.Message.MESSAGE_TYPE.READY;
 
 public class AgentServerThread extends Thread {
-    private int port;
     private Socket client;
+    private final Agent agent;
 
-    public AgentServerThread(final String name, final int serverPort, final Socket client) {
-        super(name + System.currentTimeMillis());
-        this.port = serverPort;
+    public AgentServerThread(final Agent agent, final Socket client) {
+        super(agent.getName() + System.currentTimeMillis());
+        this.agent = agent;
         this.client = client;
     }
 
@@ -22,13 +23,19 @@ public class AgentServerThread extends Thread {
         try (
                 ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
                 final ObjectInputStream in = new ObjectInputStream(client.getInputStream())) {
-            Message message = new Message.MessageBuilder().withSender(port).withType(READY).build();
+            Message message = new Message.MessageBuilder().withSender(agent.getPort()).withType(READY).build();
             out.writeObject(message);
             Object fromClient;
             while ((fromClient = in.readObject()) != null) {
                 if (fromClient instanceof Message) {
-                    System.out.println(String.format("%d received: %s%n", this.port, fromClient.toString()));
-                    break;
+                    final Message msg = (Message) fromClient;
+                    if (NEW_BLOCK == msg.type) {
+                        System.out.println(String.format("%d received: %s%n", agent.getPort(), fromClient.toString()));
+                        synchronized (agent) {
+                            agent.addBlock(msg.block);
+                        }
+                        break;
+                    }
                 }
             }
             client.close();

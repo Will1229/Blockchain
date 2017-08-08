@@ -11,71 +11,80 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import static agent.Message.MESSAGE_TYPE.NEW_BLOCK;
 import static agent.Message.MESSAGE_TYPE.READY;
-import static agent.Message.MESSAGE_TYPE.RESPONSE;
 
-public class Agent implements Runnable {
+public class Agent {
 
     private String name;
     private int port;
+    private List<Agent> peers;
+    private List<Block> blockchain = new ArrayList<>();
 
     private ServerSocket serverSocket;
     private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(10);
+
     private boolean listening = true;
 
-    private List<Block<String>> blockchain = new ArrayList<>();
+    // for jackson
+    public Agent() {
+    }
 
-    public Agent(String name, final int port, Block<String> root) {
+    Agent(String name, final int port, Block root, final List<Agent> agents) {
         this.name = name;
         this.port = port;
+        this.peers = agents;
         blockchain.add(root);
     }
 
-
-    @Override
-    public void run() {
-        addBlock();
-    }
-
-    public void addBlock() {
+    public Block createBlock() {
         if (blockchain.isEmpty()) {
-            return;
+            return null;
         }
 
-        Block<String> previousBlock = getLatestBlock();
+        Block previousBlock = getLatestBlock();
         if (previousBlock == null) {
-            return;
+            return null;
         }
 
         final int index = previousBlock.getIndex() + 1;
-        final Block<String> block = new Block<>(index, previousBlock.getHash(), String.valueOf(index) + "-payload");
+        final Block block = new Block(index, previousBlock.getHash(), name);
         System.out.println(String.format("%s created new block %s", name, block.toString()));
+        broadcast(block);
+        return block;
+    }
+
+    void addBlock(Block block) {
         if (isBlockValid(block)) {
             blockchain.add(block);
-            broadcast(block);
         }
     }
 
-    private void broadcast(final Block<String> block) {
-//        send("localhost", 1001, block);
-        send("localhost", 1002, block);
-        send("localhost", 1003, block);
+    public List<Block> getBlockchain() {
+        return blockchain;
     }
 
-    private Block<String> getLatestBlock() {
+    private void broadcast(final Block block) {
+        for (Agent peer : peers) {
+            send("localhost", peer.getPort(), block);
+        }
+    }
+
+    private Block getLatestBlock() {
         if (blockchain.isEmpty()) {
             return null;
         }
         return blockchain.get(blockchain.size() - 1);
     }
 
-    private boolean isBlockValid(final Block<String> block) {
-        final Block<String> latestBlock = getLatestBlock();
+    private boolean isBlockValid(final Block block) {
+        final Block latestBlock = getLatestBlock();
         if (latestBlock == null) {
             return false;
         }
-        if (block.getIndex() != latestBlock.getIndex() + 1) {
-            System.out.println(String.format("Invalid index. Expected: %s Actual: %s", latestBlock.getIndex() + 1, block.getIndex()));
+        final int expected = latestBlock.getIndex() + 1;
+        if (block.getIndex() != expected) {
+            System.out.println(String.format("Invalid index. Expected: %s Actual: %s", expected, block.getIndex()));
             return false;
         }
         if (!Objects.equals(block.getPreviousHash(), latestBlock.getHash())) {
@@ -92,20 +101,20 @@ public class Agent implements Runnable {
             try {
                 serverSocket = new ServerSocket(port);
                 System.out.println(String.format("Server %s started", serverSocket.getLocalPort()));
-
+                listening = true;
                 while (listening) {
-                    final AgentServerThread thread = new AgentServerThread(name, port, serverSocket.accept());
+                    final AgentServerThread thread = new AgentServerThread(this, serverSocket.accept());
                     thread.start();
                 }
                 serverSocket.close();
             } catch (IOException e) {
-                System.err.println("Could not listen on port " + port);
-                System.exit(-1);
+                System.err.println("Could not listen to port " + port);
             }
         });
     }
 
     public void stopHost() {
+        listening = false;
         try {
             serverSocket.close();
         } catch (IOException e) {
@@ -113,7 +122,7 @@ public class Agent implements Runnable {
         }
     }
 
-    private void send(String host, int port, Block<?> block) {
+    private void send(String host, int port, Block block) {
         try (
                 final Socket peer = new Socket(host, port);
                 final ObjectOutputStream out = new ObjectOutputStream(peer.getOutputStream());
@@ -124,19 +133,25 @@ public class Agent implements Runnable {
                     final Message msg = (Message) fromPeer;
                     System.out.println(String.format("%d received: %s", this.port, msg.toString()));
                     if (READY == msg.type) {
-                        out.writeObject(new Message.MessageBuilder().withType(RESPONSE).withReceiver(port).withSender(this.port).withBlock(block).build());
+                        out.writeObject(new Message.MessageBuilder().withType(NEW_BLOCK).withReceiver(port).withSender(this.port).withBlock(block).build());
                         break;
                     }
                 }
             }
         } catch (UnknownHostException e) {
             System.err.println("Unknown host " + host);
-            System.exit(1);
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " + host);
-            System.exit(1);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPort() {
+        return port;
     }
 }
