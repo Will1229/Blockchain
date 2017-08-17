@@ -62,3 +62,8 @@ curl -X DELETE http://localhost:8080/agent/all
 ```
 
 
+## Functions to be added
+- Add a web interface for better demostration
+- Get the lastest blockchain whenever a new agent is added into the network
+- Add service discovery so that new peer can get connected to others automatically
+- And much more...
