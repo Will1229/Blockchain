@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+    <title>Block Chain Console</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+<script src="js/app.js"></script>
+<h1>Block Chain Console v1.0</h1>
+<hr>
+
+<p>
+    <button type="button" id="getAll" onclick="getAllAgents()" class="button">Show All Agents
+    </button>
+    <button type="button" id="delAll" onclick="deleteAllAgents()" class="button">Delete All Agents
+    </button>
+    <button type="button" id="reset" onclick="resetView()" class="button">Reset View
+    </button>
+
+</p>
+<p>
+    Name <input id="agentNameAdd" size="10" value="Agent 1" title="">
+    <button type="button" class="button" id="addAgent" onclick="createAgent()">Add a new agent</button>
+</p>
+<p>
+    Name <input id="agentNameGet" size="10" value="Agent 1" title="">
+    <button type="button" class="button" id="getAgent" onclick="getAgent()">Show an agent</button>
+</p>
+<p>
+    Name <input id="agentNameDel" size="10" value="Agent 1" title="">
+    <button type="button" class="button" id="add2Agent" onclick="deleteAgent()">Add a new agent</button>
+</p>
+<p>
+</p>
+<hr>
+
+
+<p id="test">
+    <b>Output: </b>
+</p>
+
+</body>
+</html>

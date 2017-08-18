@@ -1,22 +1,53 @@
-# Compiled class file
 *.class
-
-# Log file
+**/bin/
+**/build/
+**/classes/
 *.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+**/.nb*/
+**/*.swp
+**/*.swo
 
 # Package Files #
 *.jar
 *.war
 *.ear
-*.zip
-*.tar.gz
-*.rar
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+*.zip
+
+# Various settings files that should be handled otherwise
+.classpath
+.project
+.gradle
+.settings
+.pmd
+gradle.properties
+gradlew
+**/gradlew
+**/gradlew.bat
+**/gradle/
+
+# Windows binary executables
+*.exe
+
+# Editor backup files
+*.bak
+*.*~
+*.keep
+*.contrib
+
+# BeyondCompare3 temp & backup files files
+*.orig
+*.java.*.*.java
+.idea/tasks.xml
+.idea/workspace.xml
+.idea/libraries
+.idea/**
+/bin/
+*.iml
+*.ipr
+*.iws
+out/
+.metadata/

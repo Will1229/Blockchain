@@ -1,7 +1,18 @@
-h1 {
-    color: #0000FF;
+button.button:hover {
+    color: orangered;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
-h2 {
-    color: #FF0000;
+button.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    width: 150px;
+    padding: 6px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
 }
