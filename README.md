@@ -28,7 +28,7 @@ $ gradle bootRun
 ```
 2. Open http://localhost:8080/ in browser and try it from web page:
 
-![block chain demo](https://raw.githubusercontent.com/Will1229/Blockchain/blob/master/image/web.PNG)
+![block chain demo](https://raw.githubusercontent.com/Will1229/Blockchain/master/image/web.PNG)
 
 3. Or use curl directly from command line:
 
