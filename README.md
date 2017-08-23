@@ -26,7 +26,11 @@ A web interface implemented with Springboot is included in this project to demos
 ```
 $ gradle bootRun
 ```
-2. Open http://localhost:8080/ from browser or use curl directly from command line.
+2. Open http://localhost:8080/ in browser and try it from web page:
+
+![block chain demo](https://raw.githubusercontent.com/Will1229/Blockchain/blob/master/image/web.PNG)
+
+3. Or use curl directly from command line:
 
 ### Create new agent
 ```
