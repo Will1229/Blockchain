@@ -16,3 +16,76 @@ button.button {
     margin: 4px 2px;
     cursor: pointer;
 }
+
+button.cellButton {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    width: 100px;
+    padding: 6px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+p.agent {
+    font-size: 16px;
+    font-family: Arial, serif;
+    font-weight: bold;
+}
+
+p.msg {
+    font-size: 12px;
+    font-style: italic;
+    font-family: Arial, serif;
+}
+
+input {
+    font-size: 16px;
+    font-family: Arial, fantasy;
+}
+
+h1 {
+    text-align: center;
+    color: darkblue;
+    font-family: Arial, fantasy;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 90%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 5px;
+}
+
+[title~="Agent1"] {
+    color: red;
+}
+
+[title~="Agent2"] {
+    color: blue;
+}
+
+[title~="Agent3"] {
+    color: orangered;
+}
+
+[title~="Agent4"] {
+    color: orange;
+}
+
+[title~="Agent5"] {
+    color: aqua;
+}
+
+td.blockchain {
+    font-size: 12px;
+}

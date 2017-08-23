@@ -31,8 +31,7 @@ public class AgentController {
 
     @RequestMapping(method = POST, params = {"name", "port"})
     public Agent addAgent(@RequestParam("name") String name, @RequestParam("port") int port) {
-        agentManager.addAgent(name, port);
-        return agentManager.getAgent(name);
+        return agentManager.addAgent(name, port);
     }
 
     @RequestMapping(path = "all", method = GET)
@@ -47,10 +46,6 @@ public class AgentController {
 
     @RequestMapping(method = POST, path = "mine")
     public Block createBlock(@RequestParam(value = "agent") final String name) {
-        final Agent agent = agentManager.getAgent(name);
-        if (agent != null) {
-            return agent.createBlock();
-        }
-        return null;
+        return agentManager.createBlock(name);
     }
 }

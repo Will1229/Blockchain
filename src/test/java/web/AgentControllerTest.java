@@ -82,19 +82,20 @@ public class AgentControllerTest {
 
     @Test
     public void createBlockSingleAgent() throws Exception {
-        final String name = "A1";
+        final String agentName = "A1";
         final int port = 1001;
-        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), name, port), null, String.class);
-        ResponseEntity<String> response = template.postForEntity(String.format("%s/mine?agent=%s", baseUrl.toString(), name), null, String.class);
+        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), agentName, port), null, String.class);
+        ResponseEntity<String> response = template.postForEntity(String.format("%s/mine?agent=%s", baseUrl.toString(), agentName), null, String.class);
         final Block b = mapper.readValue(response.getBody(), Block.class);
         assertThat(b.getIndex(), is(1));
-        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), name), String.class);
+        assertThat(b.getCreator(), is(agentName));
+        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), agentName), String.class);
         final Agent a = mapper.readValue(response.getBody(), Agent.class);
-        assertThat(a.getName(), is(name));
+        assertThat(a.getName(), is(agentName));
         assertThat(a.getPort(), is(port));
         assertThat(a.getBlockchain().size(), is(2));
-        template.delete(String.format("%s?name=%s", baseUrl.toString(), name));
-        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), name), String.class);
+        template.delete(String.format("%s?name=%s", baseUrl.toString(), agentName));
+        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), agentName), String.class);
         assertThat(response.getBody(), is(nullValue()));
 
     }

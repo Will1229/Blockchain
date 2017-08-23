@@ -8,10 +8,11 @@ public class AgentManager {
     private List<Agent> agents = new ArrayList<>();
     private static final Block root = new Block(0, "ROOT_HASH", "ROOT");
 
-    public void addAgent(String name, int port) {
+    public Agent addAgent(String name, int port) {
         Agent a = new Agent(name, port, root, agents);
         a.startHost();
         agents.add(a);
+        return a;
     }
 
     public Agent getAgent(String name) {
@@ -48,5 +49,13 @@ public class AgentManager {
             a.stopHost();
         }
         agents.clear();
+    }
+
+    public Block createBlock(final String name) {
+        final Agent agent = getAgent(name);
+        if (agent != null) {
+            return agent.createBlock();
+        }
+        return null;
     }
 }

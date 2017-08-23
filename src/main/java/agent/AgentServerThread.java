@@ -30,7 +30,7 @@ public class AgentServerThread extends Thread {
                 if (fromClient instanceof Message) {
                     final Message msg = (Message) fromClient;
                     if (NEW_BLOCK == msg.type) {
-                        System.out.println(String.format("%d received: %s%n", agent.getPort(), fromClient.toString()));
+                        System.out.println(String.format("%d received: %s", agent.getPort(), fromClient.toString()));
                         synchronized (agent) {
                             agent.addBlock(msg.block);
                         }
