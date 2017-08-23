@@ -22,7 +22,15 @@ A web interface implemented with Springboot is included in this project to demos
 ## Quick Start
 
 ### Start web interface
-Build the project and run the Springboot Application
+1. Navigate to project root dir and start the server:
+```
+$ gradle bootRun
+```
+2. Open http://localhost:8080/ in browser and try it from web page:
+
+![block chain demo](https://raw.githubusercontent.com/Will1229/Blockchain/master/image/web.PNG)
+
+3. Or use curl directly from command line:
 
 ### Create new agent
 ```
