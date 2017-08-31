@@ -1,7 +1,10 @@
 # A simple implementation of blockchain
 This project aims to create a simple implementation of blockchain in java for inspired by [this project](https://github.com/lhartikk/naivechain). 
 
-
+## Change log
+- [ ] 20170831 Let newly added agent sync the latest blockchain from peers.
+- [x] 20170818 Add a web interface.
+- [x] 20170807 Server side code base with rest interface.
 
 ## Design Concept
 This project consists of two main parts: agent and web interface.
@@ -21,18 +24,20 @@ A web interface implemented with Springboot is included in this project to demos
 
 ## Quick Start
 
-### Start web interface
-1. Navigate to project root dir and start the server:
+### Start server
+Navigate to project root dir and start the server:
 ```
 $ gradle bootRun
 ```
-2. Open http://localhost:8080/ in browser and try it from web page:
+### Use web interface
+Open http://localhost:8080/ in browser and try it from web page:
 
 ![block chain demo](https://raw.githubusercontent.com/Will1229/Blockchain/master/image/web.PNG)
 
-3. Or use curl directly from command line:
+### Use rest interface
+Use curl directly from command line to interact with the server:
 
-### Create new agent
+#### Create new agent
 ```
 curl -X POST "http://localhost:8080/agent?name=A1&port=1001"
 {"name":"A1","port":1001,"blockchain":[{"index":0,"timestamp":1502193341671,"hash":"4f99b67b06b6831886815ffe66a55be2e34dcefdfc16b6214710313062a8a480","previousHash":"ROOT_HASH"}]}
@@ -44,7 +49,7 @@ curl -X POST "http://localhost:8080/agent?name=A3&port=1003"
 {"name":"A3","port":1003,"blockchain":[{"index":0,"timestamp":1502193341671,"hash":"4f99b67b06b6831886815ffe66a55be2e34dcefdfc16b6214710313062a8a480","previousHash":"ROOT_HASH"}]}
 ```
 
-### Mine block
+#### Mine block
 ```
 curl -X POST "http://localhost:8080/agent/mine?agent=A1"
 {"index":1,"timestamp":1502194172250,"hash":"2461f27f811df15a969391c70f136869a282224e8cc6fe8b628d16a499515d21","previousHash":"4f99b67b06b6831886815ffe66a55be2e34dcefdfc16b6214710313062a8a480"}
@@ -53,7 +58,7 @@ curl -X POST "http://localhost:8080/mine?name=A3"
 {"timestamp":1502194200235,"status":404,"error":"Not Found","message":"No message available","path":"/mine"}
 ```
 
-### Show agents and blocks
+#### Show agents and blocks
 ```
 curl http://localhost:8080/agent?name=A1
 {"name":"A1","port":1001,"blockchain":[{"index":0,"timestamp":1502193341671,"hash":"4f99b67b06b6831886815ffe66a55be2e34dcefdfc16b6214710313062a8a480","previousHash":"ROOT_HASH"},{"index":1,"timestamp":1502194172250,"hash":"2461f27f811df15a969391c70f136869a282224e8cc6fe8b628d16a499515d21","previousHash":"4f99b67b06b6831886815ffe66a55be2e34dcefdfc16b6214710313062a8a480"}]}
@@ -64,14 +69,7 @@ curl http://localhost:8080/agent?name=A3
 curl http://localhost:8080/agent/all
 ```
 
-### Remove agent
+#### Remove agent
 ```
 curl -X DELETE http://localhost:8080/agent/all
 ```
-
-
-## Functions to be added
-- Add a web interface for better demostration
-- Get the lastest blockchain whenever a new agent is added into the network
-- Add service discovery so that new peer can get connected to others automatically
-- And much more...
