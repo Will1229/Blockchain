@@ -1,20 +1,23 @@
 package agent;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     int sender;
     int receiver;
     MESSAGE_TYPE type;
-    Block block;
+    List<Block> blocks;
 
     public enum MESSAGE_TYPE {
-        READY, NEW_BLOCK
+        READY, INFO_NEW_BLOCK, REQ_ALL_BLOCKS, RSP_ALL_BLOCKS
     }
 
     @Override
     public String toString() {
-        return String.format("Message {type=%s, sender=%d, receiver=%d, block=%s}", type, sender, receiver, block);
+        return String.format("Message {type=%s, sender=%d, receiver=%d, blocks=%s}", type, sender, receiver, blocks);
     }
 
     static class MessageBuilder {
@@ -35,8 +38,8 @@ public class Message implements Serializable {
             return this;
         }
 
-        MessageBuilder withBlock(final Block block) {
-            message.block = block;
+        MessageBuilder withBlocks(final List<Block> blocks) {
+            message.blocks = blocks;
             return this;
         }
 

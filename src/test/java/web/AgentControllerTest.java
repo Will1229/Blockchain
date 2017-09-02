@@ -4,6 +4,7 @@ import agent.Agent;
 import agent.Block;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +15,10 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,6 +27,10 @@ import static org.hamcrest.core.IsNull.nullValue;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AgentControllerTest {
+
+    private static final String AGENT1 = "A1";
+    private static final String AGENT2 = "A2";
+    private static final String AGENT3 = "A3";
 
     @LocalServerPort
     private int port;
@@ -35,100 +42,158 @@ public class AgentControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Before
-    public void setUp() throws Exception {
+    public void before() throws Exception {
         baseUrl = new URL("http://localhost:" + port + "/agent");
     }
 
+    @After
+    public void after() throws Exception {
+        Thread.sleep(500);
+        deleteAllAgents();
+    }
+
     @Test
-    public void getEmptyAgent() {
-        ResponseEntity<String> response = template.getForEntity(baseUrl.toString() + "?name=NOT_EXIST", String.class);
-        assertThat(response.getBody(), is(nullValue()));
+    public void getEmptyAgent() throws IOException {
+        final Agent a = getAgent("NOT_EXIST");
+        assertThat(a, is(nullValue()));
     }
 
     @Test
     public void addGetDeleteAgent() throws Exception {
-        final String name = "A1";
+        final String name = AGENT1;
         final int port = 1001;
-        ResponseEntity<String> response = template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), name, port), null, String.class);
-        Agent a = mapper.readValue(response.getBody(), Agent.class);
+        Agent a = createAgent(name, port);
+        assert a != null;
         assertThat(a.getName(), is(name));
         assertThat(a.getPort(), is(port));
         assertThat(a.getBlockchain().size(), is(1));
-        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), name), String.class);
-        a = mapper.readValue(response.getBody(), Agent.class);
+        a = getAgent(name);
+        assert a != null;
         assertThat(a.getName(), is(name));
         assertThat(a.getPort(), is(port));
         assertThat(a.getBlockchain().size(), is(1));
-        Thread.sleep(1000);
-        template.delete(String.format("%s?name=%s", baseUrl.toString(), name));
-        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), name), String.class);
-        assertThat(response.getBody(), is(nullValue()));
+        Thread.sleep(500);
+        deleteAgent(name);
+        a = getAgent(name);
+        assertThat(a, is(nullValue()));
     }
 
     @Test
     public void getDeleteAllAgents() throws Exception {
-        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), "A1", 1001), null, String.class);
-        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), "A2", 1002), null, String.class);
-        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), "A3", 1003), null, String.class);
-        ResponseEntity<String> response = template.getForEntity(String.format("%s/all", baseUrl.toString()), String.class);
-        JavaType type = mapper.getTypeFactory().constructParametricType(List.class, Agent.class);
-        List<Agent> a = mapper.readValue(response.getBody(), type);
-        assertThat(a.size(), is(3));
-        template.delete(String.format("%s/all", baseUrl.toString()));
-        response = template.getForEntity(String.format("%s/all", baseUrl.toString()), String.class);
-        a = mapper.readValue(response.getBody(), type);
-        assertThat(a.size(), is(0));
+        createAgent(AGENT1, 1001);
+        createAgent(AGENT2, 1002);
+        createAgent(AGENT3, 1003);
+        List<Agent> agents = getAllAgents();
+        assert agents != null;
+        assertThat(agents.size(), is(3));
+        deleteAllAgents();
+        Thread.sleep(500);
+        agents = getAllAgents();
+        assert agents != null;
+        assertThat(agents.size(), is(0));
     }
 
     @Test
     public void createBlockSingleAgent() throws Exception {
-        final String agentName = "A1";
+        final String name = AGENT1;
         final int port = 1001;
-        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), agentName, port), null, String.class);
-        ResponseEntity<String> response = template.postForEntity(String.format("%s/mine?agent=%s", baseUrl.toString(), agentName), null, String.class);
-        final Block b = mapper.readValue(response.getBody(), Block.class);
+        createAgent(name, port);
+        final Block b = mine(name);
+        assert b != null;
         assertThat(b.getIndex(), is(1));
-        assertThat(b.getCreator(), is(agentName));
-        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), agentName), String.class);
-        final Agent a = mapper.readValue(response.getBody(), Agent.class);
-        assertThat(a.getName(), is(agentName));
+        assertThat(b.getCreator(), is(name));
+        Agent a = getAgent(name);
+        assert a != null;
+        assertThat(a.getName(), is(name));
         assertThat(a.getPort(), is(port));
         assertThat(a.getBlockchain().size(), is(2));
-        template.delete(String.format("%s?name=%s", baseUrl.toString(), agentName));
-        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), agentName), String.class);
-        assertThat(response.getBody(), is(nullValue()));
-
+        deleteAgent(name);
+        a = getAgent(name);
+        assertThat(a, is(nullValue()));
     }
+
 
     @Test
     public void createBlockMultiAgent() throws Exception {
-        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), "A1", 1001), null, String.class);
-        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), "A2", 1002), null, String.class);
-        template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), "A3", 1003), null, String.class);
+        createAgent(AGENT1, 1001);
+        createAgent(AGENT2, 1002);
+        createAgent(AGENT3, 1003);
 
-        template.postForEntity(String.format("%s/mine?agent=%s", baseUrl.toString(), "A1"), null, String.class);
-        ResponseEntity<String> response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), "A1"), String.class);
-        final Agent a1 = mapper.readValue(response.getBody(), Agent.class);
+        mine(AGENT1);
+        final Agent a1 = getAgent(AGENT1);
+        assert a1 != null;
         final String hash = a1.getBlockchain().get(1).getHash();
-        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), "A2"), String.class);
-        final Agent a2 = mapper.readValue(response.getBody(), Agent.class);
+        final Agent a2 = getAgent(AGENT2);
+        assert a2 != null;
         assertThat(a2.getBlockchain().get(1).getHash(), is(hash));
-        response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), "A3"), String.class);
-        final Agent a3 = mapper.readValue(response.getBody(), Agent.class);
+        final Agent a3 = getAgent(AGENT3);
+        assert a3 != null;
         assertThat(a3.getBlockchain().get(1).getHash(), is(hash));
 
-        template.postForEntity(String.format("%s/mine?agent=%s", baseUrl.toString(), "A2"), null, String.class);
-        template.postForEntity(String.format("%s/mine?agent=%s", baseUrl.toString(), "A3"), null, String.class);
+        mine(AGENT2);
+        mine(AGENT3);
 
-        response = template.getForEntity(String.format("%s/all", baseUrl.toString()), String.class);
-        JavaType type = mapper.getTypeFactory().constructParametricType(List.class, Agent.class);
-        List<Agent> agents = mapper.readValue(response.getBody(), type);
+        List<Agent> agents = getAllAgents();
+        assert agents != null;
         assertThat(agents.size(), is(3));
         for (Agent a : agents) {
             assertThat(a.getBlockchain().size(), is(4));
         }
 
+        deleteAllAgents();
+    }
+
+    @Test
+    public void sendBlockchainToNewAgent() throws Exception {
+        createAgent(AGENT1, 1001);
+        createAgent(AGENT2, 1002);
+        IntStream.range(0, 2).forEach(value -> mine(AGENT1));
+        IntStream.range(0, 2).forEach(value -> mine(AGENT2));
+        final Agent a1 = getAgent(AGENT1);
+        assert a1 != null;
+        assertThat(a1.getBlockchain().size(), is(5));
+        final Agent a2 = getAgent(AGENT2);
+        assert a2 != null;
+        assertThat(a2.getBlockchain().size(), is(5));
+        final Agent a3 = createAgent(AGENT3, 1003);
+        assert a3 != null;
+        assertThat(a3.getBlockchain().size(), is(5));
+        assertThat(a1.getBlockchain().equals(a3.getBlockchain()), is(true));
+        assertThat(a2.getBlockchain().equals(a3.getBlockchain()), is(true));
+    }
+
+
+    private Block mine(final String name) {
+        final ResponseEntity<String> response = template.postForEntity(String.format("%s/mine?agent=%s", baseUrl.toString(), name), null, String.class);
+        try {
+            return response.getBody() == null ? null : mapper.readValue(response.getBody(), Block.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Agent getAgent(final String name) throws IOException {
+        final ResponseEntity<String> response = template.getForEntity(String.format("%s?name=%s", baseUrl.toString(), name), String.class);
+        return response.getBody() == null ? null : mapper.readValue(response.getBody(), Agent.class);
+    }
+
+    private Agent createAgent(final String name, final int port) throws IOException {
+        final ResponseEntity<String> response = template.postForEntity(String.format("%s?name=%s&port=%d", baseUrl.toString(), name, port), null, String.class);
+        return response.getBody() == null ? null : mapper.readValue(response.getBody(), Agent.class);
+    }
+
+    private List<Agent> getAllAgents() throws IOException {
+        final ResponseEntity<String> response = template.getForEntity(String.format("%s/all", baseUrl.toString()), String.class);
+        JavaType type = mapper.getTypeFactory().constructParametricType(List.class, Agent.class);
+        return response.getBody() == null ? null : mapper.readValue(response.getBody(), type);
+    }
+
+    private void deleteAllAgents() {
         template.delete(String.format("%s/all", baseUrl.toString()));
     }
 
+    private void deleteAgent(final String name) {
+        template.delete(String.format("%s?name=%s", baseUrl.toString(), name));
+    }
 }

@@ -5,11 +5,17 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Block implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int index;
     private Long timestamp;
     private String hash;
     private String previousHash;
     private String creator;
+
+    // for jackson
+    public Block() {
+    }
 
     @Override
     public String toString() {
@@ -22,8 +28,30 @@ public class Block implements Serializable {
                 '}';
     }
 
-    // for jackson
-    public Block() {
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Block block = (Block) o;
+        return index == block.index
+                && timestamp.equals(block.timestamp)
+                && hash.equals(block.hash)
+                && previousHash.equals(block.previousHash)
+                && creator.equals(block.creator);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = index;
+        result = 31 * result + timestamp.hashCode();
+        result = 31 * result + hash.hashCode();
+        result = 31 * result + previousHash.hashCode();
+        result = 31 * result + creator.hashCode();
+        return result;
     }
 
     public Block(int index, String preHash, String creator) {

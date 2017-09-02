@@ -7,13 +7,19 @@ buildscript {
     }
 }
 
+apply plugin: 'war'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 
 jar {
-    baseName = 'gs-spring-boot'
-    version = '0.1.0'
+    baseName = 'blockchain-demo'
+    version = '0.0.1'
+}
+
+war {
+    baseName = 'blockchain-demo'
+    version = '0.0.1'
 }
 
 repositories {
