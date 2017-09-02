@@ -1,8 +1,8 @@
 # A simple implementation of blockchain
-This project aims to create a simple implementation of blockchain in java for inspired by [this project](https://github.com/lhartikk/naivechain). 
+This project aims to create a simple implementation of blockchain concept and demostrate it in a user friendly way. 
 
 ## Change log
-- [ ] 20170831 Let newly added agent sync the latest blockchain from peers.
+- [x] 20170902 Let newly added agent sync the latest blockchain from peers.
 - [x] 20170818 Add a web interface.
 - [x] 20170807 Server side code base with rest interface.
 
@@ -73,3 +73,6 @@ curl http://localhost:8080/agent/all
 ```
 curl -X DELETE http://localhost:8080/agent/all
 ```
+
+
+This project is inspired by [naivechain](https://github.com/lhartikk/naivechain). 
