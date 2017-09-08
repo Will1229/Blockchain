@@ -1,25 +1,21 @@
 # A simple implementation of blockchain
 This project aims to create a simple implementation of blockchain concept and demostrate it in a user friendly way. 
 
-## Change log
-- [x] 20170902 Let newly added agent sync the latest blockchain from peers.
-- [x] 20170818 Add a web interface.
-- [x] 20170807 Server side code base with rest interface.
-
 ## Design Concept
-This project consists of two main parts: agent and web interface.
+This project consists of two main parts: agent and interface.
 
 ### Agent
-One agent stands for one peer which is able to store and mine blocks in the network. Every agent is connected to all the other agents in the network to construct a P2P distributed network. The basic functions for an agent are:
+An agent stands for one peer which is able to store and mine blocks in the network. Every agent is connected to all the other agents in the network to construct a P2P distributed network. The basic functions for an agent are:
 1. Send message to other agents, in order to broadcast its newly mined block
 2. Receive message from other agents, in order to receive blocks mined by other agents
 3. Mine, validate and grow blocks on its own bloackchain
+4. Sync latest blockchain with other agents
 
 The algorithm for mining is the key of a blockchain. In this project we only use SHA256 hash to simulate the mining procedure. 
 
 
-### Web interface
-A web interface implemented with Springboot is included in this project to demostrate the usage of the blockchain. It might make people feel like a centralized management interface, however we need to understand that agents can also run independently. The interface is RESTful and all return data is in json format.
+### Interface
+An interface implemented with Springboot is included in this project to demostrate the usage of the blockchain. It might make people feel like a centralized management interface, however we need to understand that agents can also run independently. The interface is RESTful and all return data is in json format. A single page application is also provided to visualize the blockchain concept in a better way.
 
 
 ## Quick Start
@@ -30,7 +26,10 @@ Navigate to project root dir and start the server:
 $ gradle bootRun
 ```
 ### Use web interface
-Open http://localhost:8080/ in browser and try it from web page:
+Open http://localhost:8080/ in browser and try it from web page. Basic actions are:
+- Add an agent to the network
+- Delete an agent from the network
+- Mine a new block and broadcast to the network. A color scheme is used to mark different blocks created by different agents.
 
 ![block chain demo](https://raw.githubusercontent.com/Will1229/Blockchain/master/image/web.PNG)
 
@@ -73,6 +72,11 @@ curl http://localhost:8080/agent/all
 ```
 curl -X DELETE http://localhost:8080/agent/all
 ```
+
+## Change log
+- [x] 20170902 Let newly added agent sync the latest blockchain from peers.
+- [x] 20170818 Add a web interface.
+- [x] 20170807 Server side code base with rest interface.
 
 
 This project is inspired by [naivechain](https://github.com/lhartikk/naivechain). 
