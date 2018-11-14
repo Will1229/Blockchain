@@ -30,8 +30,10 @@ public class AgentController {
     }
 
     @RequestMapping(method = POST, params = {"name", "port"})
-    public Agent addAgent(@RequestParam("name") String name, @RequestParam("port") int port) {
-        return agentManager.addAgent(name, port);
+    public Agent addAgent(@RequestParam("name") String name,
+                          @RequestParam("name") String address,
+                          @RequestParam("port") int port) {
+        return agentManager.addAgent(name, address, port);
     }
 
     @RequestMapping(path = "all", method = GET)

@@ -1,4 +1,4 @@
-package agent;
+2package agent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,8 @@ public class AgentManager {
     private List<Agent> agents = new ArrayList<>();
     private static final Block root = new Block(0, "ROOT_HASH", "ROOT");
 
-    public Agent addAgent(String name, int port) {
-        Agent a = new Agent(name, "localhost", port, root, agents);
+    public Agent addAgent(String name, String address int port) {
+        Agent a = new Agent(name, address, port, root, agents);
         a.startHost();
         agents.add(a);
         return a;
