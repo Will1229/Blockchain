@@ -24,10 +24,7 @@ hs_err_pid*
 .settings
 .pmd
 gradle.properties
-gradlew
-**/gradlew
-**/gradlew.bat
-**/gradle/
+
 
 # Windows binary executables
 *.exe
