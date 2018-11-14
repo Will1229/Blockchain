@@ -29,7 +29,7 @@ public class AgentController {
 
     @RequestMapping(method = POST, params = {"name", "port"})
     public Agent addAgent(@RequestParam("name") String name,
-                          @RequestParam("name") String address,
+                          @RequestParam("addressd --a") String address,
                           @RequestParam("port") int port) {
         return agentManager.addAgent(name, address, port);
     }
