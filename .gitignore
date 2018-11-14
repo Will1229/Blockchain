@@ -8,7 +8,6 @@
 **/*.swo
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
