@@ -11,6 +11,7 @@ apply plugin: 'war'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'application'
 
 jar {
     baseName = 'blockchain-demo'
@@ -20,6 +21,10 @@ jar {
 war {
     baseName = 'blockchain-demo'
     version = '0.0.1'
+}
+
+application {
+    mainClass = 'web.Application'
 }
 
 repositories {
